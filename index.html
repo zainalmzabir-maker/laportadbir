@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Pentadbir Bertugas - SMK Kamarul Ariffin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea * { visibility: visible; }
+      #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+    .signature-pad {
+      border: 2px dashed #94a3b8;
+      border-radius: 0.5rem;
+      background-color: #f8fafc;
+      touch-action: none;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Header & Navigasi -->
+  <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40 no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-school-flag text-2xl text-amber-400"></i>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">SMK KAMARUL ARIFFIN</h1>
+          <p class="text-xs text-indigo-200">Sistem Laporan Pentadbir Bertugas (Labis, Johor)</p>
+        </div>
+      </div>
+      <nav class="flex space-x-1 sm:space-x-2">
+        <button onclick="switchTab('pengisian')" id="btn-tab-pengisian" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-white/20 hover:bg-white/30 transition">
+          <i class="fa-solid fa-pen-to-square mr-1.5"></i>Pengisian
+        </button>
+        <button onclick="switchTab('dashboard')" id="btn-tab-dashboard" class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/20 transition">
+          <i class="fa-solid fa-table-list mr-1.5"></i>Dashboard
+        </button>
+        <button onclick="switchTab('cetakan')" id="btn-tab-cetakan" class="px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-white/20 transition">
+          <i class="fa-solid fa-print mr-1.5"></i>Cetakan Laporan
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Kandungan Utama -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6">
+
+    <!-- TAB 1: PENGISIAN -->
+    <section id="tab-pengisian" class="space-y-6">
+      <div class="bg-white rounded-xl shadow p-6 border-t-4 border-indigo-700">
+        <div class="text-center pb-4 border-b">
+          <h2 class="text-xl font-bold tracking-wide text-slate-900">SMK KAMARUL ARIFFIN LABIS JOHOR</h2>
+          <p class="text-sm font-semibold text-slate-600 uppercase">Borang Pemantauan Pentadbir Bertugas</p>
+        </div>
+
+        <form id="formLaporan" onsubmit="hantarBorang(event)" class="mt-6 space-y-6">
+          <!-- Maklumat Asas -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 bg-slate-50 p-4 rounded-lg border">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Tarikh *</label>
+              <input type="date" id="tarikh" required class="w-full text-sm border rounded-md p-2 bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Hari *</label>
+              <select id="hari" required class="w-full text-sm border rounded-md p-2 bg-white">
+                <option value="">Pilih Hari</option>
+                <option>Ahad</option><option>Isnin</option><option>Selasa</option>
+                <option>Rabu</option><option>Khamis</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Masa</label>
+              <input type="text" id="masa" placeholder="Cth: 7:20 PG - 2:00 PTG" class="w-full text-sm border rounded-md p-2 bg-white">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Pentadbir Bertugas *</label>
+              <input type="text" id="pentadbir" required placeholder="Nama Pentadbir" class="w-full text-sm border rounded-md p-2 bg-white">
+            </div>
+          </div>
+
+          <!-- 1. Kehadiran -->
+          <div class="border rounded-lg p-4 bg-white shadow-sm">
+            <h3 class="font-bold text-indigo-900 text-sm mb-3 border-b pb-1">1. KEHADIRAN</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Kehadiran Guru</label>
+                <input type="text" id="kehadiranGuru" placeholder="Cth: 48 / 50 orang" class="w-full text-sm border rounded p-2">
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Kehadiran Murid</label>
+                <input type="text" id="kehadiranMurid" placeholder="Cth: 95.2%" class="w-full text-sm border rounded p-2">
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Guru Lewat Hadir (jika ada)</label>
+                <input type="text" id="guruLewat" placeholder="Senarai nama / bilangan" class="w-full text-sm border rounded p-2">
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Murid Lewat Hadir (anggaran)</label>
+                <input type="text" id="muridLewat" placeholder="Bilangan murid lewat" class="w-full text-sm border rounded p-2">
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Suasana Pagi / Perhimpunan -->
+          <div class="border rounded-lg p-4 bg-white shadow-sm">
+            <h3 class="font-bold text-indigo-900 text-sm mb-3 border-b pb-1">2. SUASANA PAGI / PERHIMPUNAN</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-6">
+                <span class="text-xs font-medium text-slate-700">Perhimpunan:</span>
+                <label class="inline-flex items-center text-sm gap-1.5 cursor-pointer">
+                  <input type="radio" name="perhimpunan" value="Ada" checked class="text-indigo-600"> Ada
+                </label>
+                <label class="inline-flex items-center text-sm gap-1.5 cursor-pointer">
+                  <input type="radio" name="perhimpunan" value="Tiada" class="text-indigo-600"> Tiada
+                </label>
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Ringkasan Pengisian Perhimpunan</label>
+                <textarea id="ringkasanPerhimpunan" rows="2" class="w-full text-sm border rounded p-2" placeholder="Ucapan pengetua / pengumuman penting guru bertugas"></textarea>
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Suasana Umum (tenang/terganggu dll)</label>
+                <input type="text" id="suasanaUmum" placeholder="Cth: Tenang dan teratur" class="w-full text-sm border rounded p-2">
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Pengurusan Kelas / PdP -->
+          <div class="border rounded-lg p-4 bg-white shadow-sm">
+            <h3 class="font-bold text-indigo-900 text-sm mb-3 border-b pb-1">3. PENGURUSAN KELAS / PdP</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-6">
+                <span class="text-xs font-medium text-slate-700">Guru masuk kelas mengikut jadual?</span>
+                <label class="inline-flex items-center text-sm gap-1.5 cursor-pointer">
+                  <input type="radio" name="ikutJadual" value="Ya" checked class="text-indigo-600"> Ya
+                </label>
+                <label class="inline-flex items-center text-sm gap-1.5 cursor-pointer">
+                  <input type="radio" name="ikutJadual" value="Tidak" class="text-indigo-600"> Tidak
+                </label>
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Kelas tanpa guru (jika ada)</label>
+                <input type="text" id="kelasTanpaGuru" placeholder="Nyatakan kelas jika ada" class="w-full text-sm border rounded p-2">
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Pemantauan PdP / Program Akademik</label>
+                <input type="text" id="pemantauanPdp" placeholder="Catatan pemantauan akademik harian" class="w-full text-sm border rounded p-2">
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Disiplin & Sahsiah Murid -->
+          <div class="border rounded-lg p-4 bg-white shadow-sm">
+            <h3 class="font-bold text-indigo-900 text-sm mb-3 border-b pb-1">4. DISIPLIN & SAHSIAH MURID</h3>
+            <div class="space-y-3">
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Kes Disiplin (jika ada)</label>
+                <input type="text" id="kesDisiplin" placeholder="Jenis kes (cth: lewat hadir, kekemasan pakaian)" class="w-full text-sm border rounded p-2">
+              </div>
+              <div>
+                <label class="text-xs font-medium text-slate-600 block mb-1">Tindakan yang telah diambil</label>
+                <input type="text" id="tindakanDisiplin" placeholder="Tindakan nasihat / rujukan guru kaunseling / demerit" class="w-full text-sm border rounded p-2">
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Fasiliti & Kebersihan -->
+          <div class="border rounded-lg p-4 bg-white shadow-sm">
+            <h3 class="font-bold text-indigo-900 text-sm mb-3 border-b pb-1">5. FASILITI & KEBERSIHAN</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+              <div>
+                <span class="text-xs font-medium text-slate-700 block mb-1">Keadaan tandas:</span>
+                <div class="flex gap-4">
+                  <label class="inline-flex items-center text-sm gap-1.5"><input type="radio" name="keadaanTandas" value="Baik" checked> Baik</label>
+                  <label class="inline-flex items-center text-sm gap-1.5"><input type="radio" name="keadaanTandas" value="Kurang memuaskan"> Kurang memuaskan</label>
+                </div>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-700 block mb-1">Keadaan kelas:</span>
+                <div class="flex gap-4">
+                  <label class="inline-flex items-center text-sm gap-1.5"><input type="radio" name="keadaanKelas" value="Baik" checked> Baik</label>
+                  <label class="inline-flex items-center text-sm gap-1.5"><input type="radio" name="keadaanKelas" value="Kurang memuaskan"> Kurang memuaskan</label>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="text-xs font-medium text-slate-600 block mb-1">Isu kemudahan rosak (jika ada)</label>
+              <input type="text" id="kemudahanRosak" placeholder="Lampu, kipas, paip bocor dll" class="w-full text-sm border rounded p-2">
+            </div>
+          </div>
+
+          <!-- 6. Catatan Tambahan -->
+          <div class="border rounded-lg p-4 bg-white shadow-sm">
+            <h3 class="font-bold text-indigo-900 text-sm mb-3 border-b pb-1">6. CATATAN TAMBAHAN / PERKARA PENTING</h3>
+            <textarea id="catatanTambahan" rows="3" placeholder="Sebarang catatan peristiwa penting atau isu khas..." class="w-full text-sm border rounded p-2"></textarea>
+          </div>
+
+          <!-- Scribble Tandatangan Pengisi -->
+          <div class="border-2 border-indigo-200 rounded-lg p-4 bg-indigo-50/40">
+            <div class="flex justify-between items-center mb-2">
+              <div>
+                <h3 class="font-bold text-indigo-950 text-sm">Tandatangan Pentadbir Bertugas *</h3>
+                <p class="text-xs text-slate-500">Sila conteng / scribble tandatangan di dalam petak di bawah.</p>
+              </div>
+              <button type="button" onclick="clearSignature('canvasPengisi')" class="text-xs text-rose-600 hover:text-rose-800 underline">
+                <i class="fa-solid fa-rotate-left mr-1"></i>Padam Semula
+              </button>
+            </div>
+            <div class="w-full flex justify-center">
+              <canvas id="canvasPengisi" width="450" height="150" class="signature-pad w-full max-w-md"></canvas>
+            </div>
+          </div>
+
+          <!-- Butang Hantar -->
+          <div class="flex justify-end gap-3 pt-3">
+            <button type="reset" class="px-5 py-2.5 rounded-lg border text-sm font-semibold text-slate-600 hover:bg-slate-100">
+              Set Semula
+            </button>
+            <button type="submit" id="btnSubmit" class="px-6 py-2.5 rounded-lg bg-indigo-700 hover:bg-indigo-800 text-white text-sm font-semibold shadow">
+              <i class="fa-solid fa-cloud-arrow-up mr-2"></i>Simpan ke Google Sheet
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 2: DASHBOARD -->
+    <section id="tab-dashboard" class="hidden space-y-4">
+      <div class="bg-white rounded-xl shadow p-6 border-t-4 border-emerald-600">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Dashboard Pemantauan Harian</h2>
+            <p class="text-xs text-slate-500">Senarai laporan dan pengesahan tandatangan Pengetua</p>
+          </div>
+          <button onclick="loadDashboardData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 border">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh Data
+          </button>
+        </div>
+
+        <!-- Filter / Search -->
+        <div class="mt-4 flex flex-wrap gap-3">
+          <input type="text" id="cariTxt" oninput="filterLaporan()" placeholder="Cari nama pentadbir / tarikh..." class="text-sm border rounded-lg px-3 py-2 flex-1 min-w-[200px]">
+          <select id="filterStatus" onchange="filterLaporan()" class="text-sm border rounded-lg px-3 py-2 bg-white">
+            <option value="Semua">Semua Status</option>
+            <option value="Menunggu Pengesahan">Menunggu Pengesahan</option>
+            <option value="Telah Disahkan">Telah Disahkan</option>
+          </select>
+        </div>
+
+        <!-- Jadual Laporan -->
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-xs uppercase border-b">
+                <th class="p-3">Tarikh & Hari</th>
+                <th class="p-3">Pentadbir Bertugas</th>
+                <th class="p-3">Kehadiran (G / M)</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-center">Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="listLaporanBody" class="divide-y text-slate-700">
+              <tr>
+                <td colspan="5" class="text-center p-6 text-slate-400">Tekan tab untuk memuatkan senarai rekod...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CETAKAN LAPORAN -->
+    <section id="tab-cetakan" class="hidden">
+      <div class="no-print mb-4 flex justify-between items-center bg-white p-4 rounded-xl shadow border">
+        <div>
+          <span class="text-sm font-semibold text-slate-700">Format Cetakan Dokumen Rasmi</span>
+          <p class="text-xs text-slate-500">Susun atur mengikut format fizikal asal SMK Kamarul Ariffin.</p>
+        </div>
+        <button onclick="window.print()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Cetak / Eksport PDF
+        </button>
+      </div>
+
+      <!-- Kertas Cetakan Format Rasmi -->
+      <div id="printArea" class="bg-white p-8 max-w-4xl mx-auto border shadow-sm text-slate-900 leading-normal text-sm">
+        <div class="text-center pb-3 border-b-2 border-black mb-4">
+          <h2 class="text-lg font-extrabold uppercase tracking-wide">SMK KAMARUL ARIFFIN LABIS JOHOR</h2>
+          <h3 class="text-base font-bold uppercase underline">BORANG PEMANTAUAN PENTADBIR BERTUGAS</h3>
+        </div>
+
+        <!-- Maklumat Utama -->
+        <div class="grid grid-cols-2 gap-y-2 mb-4 pb-3 border-b text-sm">
+          <div><span class="font-bold">Tarikh:</span> <span id="pTarikh">-</span></div>
+          <div><span class="font-bold">Hari:</span> <span id="pHari">-</span></div>
+          <div><span class="font-bold">Pentadbir Bertugas:</span> <span id="pPentadbir">-</span></div>
+          <div><span class="font-bold">Masa:</span> <span id="pMasa">-</span></div>
+        </div>
+
+        <!-- 1. Kehadiran -->
+        <div class="mb-4">
+          <h4 class="font-bold underline mb-1">1. KEHADIRAN</h4>
+          <div class="pl-4 space-y-1">
+            <p>- Kehadiran Guru: <span id="pKehadiranGuru" class="font-medium">-</span></p>
+            <p>- Kehadiran Murid: <span id="pKehadiranMurid" class="font-medium">-</span></p>
+            <p>- Guru Lewat Hadir (jika ada): <span id="pGuruLewat" class="font-medium">-</span></p>
+            <p>- Murid Lewat Hadir (anggaran): <span id="pMuridLewat" class="font-medium">-</span></p>
+          </div>
+        </div>
+
+        <!-- 2. Suasana Pagi -->
+        <div class="mb-4">
+          <h4 class="font-bold underline mb-1">2. SUASANA PAGI / PERHIMPUNAN</h4>
+          <div class="pl-4 space-y-1">
+            <p>- Perhimpunan: <span id="pPerhimpunan" class="font-medium">-</span></p>
+            <p>- Ringkasan Pengisian Perhimpunan: <span id="pRingkasanPerhimpunan" class="font-medium block pl-4 italic">-</span></p>
+            <p>- Suasana Umum (tenang/terganggu dll): <span id="pSuasanaUmum" class="font-medium">-</span></p>
+          </div>
+        </div>
+
+        <!-- 3. Pengurusan Kelas -->
+        <div class="mb-4">
+          <h4 class="font-bold underline mb-1">3. PENGURUSAN KELAS / PdP</h4>
+          <div class="pl-4 space-y-1">
+            <p>- Guru masuk kelas mengikut jadual? <span id="pIkutJadual" class="font-medium">-</span></p>
+            <p>- Kelas tanpa guru (jika ada): <span id="pKelasTanpaGuru" class="font-medium">-</span></p>
+            <p>- Pemantauan PdP / Program Akademik: <span id="pPemantauanPdp" class="font-medium">-</span></p>
+          </div>
+        </div>
+
+        <!-- 4. Disiplin -->
+        <div class="mb-4">
+          <h4 class="font-bold underline mb-1">4. DISIPLIN & SAHSIAH MURID</h4>
+          <div class="pl-4 space-y-1">
+            <p>- Kes Disiplin (jika ada): <span id="pKesDisiplin" class="font-medium">-</span></p>
+            <p>- Tindakan yang telah diambil: <span id="pTindakanDisiplin" class="font-medium">-</span></p>
+          </div>
+        </div>
+
+        <!-- 5. Fasiliti & Kebersihan -->
+        <div class="mb-4">
+          <h4 class="font-bold underline mb-1">5. FASILITI & KEBERSIHAN</h4>
+          <div class="pl-4 space-y-1">
+            <p>- Keadaan tandas: <span id="pKeadaanTandas" class="font-medium">-</span></p>
+            <p>- Keadaan kelas: <span id="pKeadaanKelas" class="font-medium">-</span></p>
+            <p>- Isu kemudahan rosak (jika ada): <span id="pKemudahanRosak" class="font-medium">-</span></p>
+          </div>
+        </div>
+
+        <!-- 6. Catatan Tambahan -->
+        <div class="mb-6">
+          <h4 class="font-bold underline mb-1">6. CATATAN TAMBAHAN / PERKARA PENTING</h4>
+          <div class="pl-4 min-h-[40px] border p-2 rounded bg-slate-50 text-slate-800" id="pCatatanTambahan">-</div>
+        </div>
+
+        <!-- Tandatangan Pengisi & Pengetua -->
+        <div class="grid grid-cols-2 gap-8 pt-6 border-t mt-6">
+          <!-- Pengisi -->
+          <div class="text-left">
+            <p class="font-bold text-xs uppercase mb-1">Disediakan oleh (Pentadbir Bertugas):</p>
+            <div class="h-24 w-44 border border-dashed border-slate-300 flex items-center justify-center bg-slate-50">
+              <img id="imgTtdPengisi" class="max-h-20 max-w-full hidden" alt="Tandatangan Pengisi">
+              <span id="noTtdPengisi" class="text-xs text-slate-400 italic">Tiada tandatangan</span>
+            </div>
+            <p class="mt-2 text-xs font-semibold">Nama: <span id="pNamaPengisiBawah">-</span></p>
+          </div>
+
+          <!-- Pengetua -->
+          <div class="text-left">
+            <p class="font-bold text-xs uppercase mb-1">Disemak oleh:</p>
+            <p class="font-extrabold text-xs mb-1">PENGETUA :</p>
+            <div class="h-24 w-44 border border-dashed border-slate-300 flex items-center justify-center bg-slate-50">
+              <img id="imgTtdPengesah" class="max-h-20 max-w-full hidden" alt="Tandatangan Pengetua">
+              <span id="noTtdPengesah" class="text-xs text-rose-400 italic">Belum disahkan</span>
+            </div>
+            <p class="mt-2 text-xs">Nama: <span id="pNamaPengesah" class="font-semibold">........................................</span></p>
+            <p class="text-xs">Tarikh: <span id="pTarikhPengesah">........................................</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: Scribble Pengesahan Pengetua -->
+  <div id="modalSahkan" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50 no-print">
+    <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-slate-800 text-base">Pengesahan Pengetua</h3>
+        <button onclick="tutupModalSahkan()" class="text-slate-400 hover:text-slate-600 text-lg">&times;</button>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pengesah</label>
+        <input type="text" id="namaPengesahInput" value="PENGETUA" class="w-full text-sm border rounded p-2">
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <label class="text-xs font-semibold text-slate-700">Conteng / Scribble Tandatangan Pengetua</label>
+          <button type="button" onclick="clearSignature('canvasPengesah')" class="text-xs text-rose-600 underline">Padam</button>
+        </div>
+        <canvas id="canvasPengesah" width="400" height="140" class="signature-pad w-full"></canvas>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="tutupModalSahkan()" class="px-4 py-2 border rounded text-xs font-semibold text-slate-600">Batal</button>
+        <button onclick="hantarPengesahan()" id="btnSimpanPengesahan" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-semibold">
+          Sahkan & Tandatangan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-slate-200 text-slate-600 text-center py-3 text-xs no-print">
+    SMK Kamarul Ariffin, Labis, Johor &bull; Sistem Pemantauan Pentadbir Bertugas
+  </footer>
+
+  <!-- SCRIPT LOGIK & INTEGRASI -->
+  <script>
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzBeeW9KU-WdXIhdduPxnDkNgsg8frXvB2iIv_vpNh61M3QPfGStpQRAe4iy3HQ34dz/exec";
+
+    let senaraiLaporanData = [];
+    let currentSelectedId = null;
+
+    // Pad Conteng Tandatangan (Mouse & Touch)
+    function setupCanvas(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext("2d");
+      let drawing = false;
+
+      function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+          x: (clientX - rect.left) * (canvas.width / rect.width),
+          y: (clientY - rect.top) * (canvas.height / rect.height)
+        };
+      }
+
+      function startDraw(e) {
+        drawing = true;
+        const pos = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#0f172a";
+        if (e.cancelable) e.preventDefault();
+      }
+
+      function draw(e) {
+        if (!drawing) return;
+        const pos = getPos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        if (e.cancelable) e.preventDefault();
+      }
+
+      function endDraw() {
+        drawing = false;
+      }
+
+      canvas.addEventListener("mousedown", startDraw);
+      canvas.addEventListener("mousemove", draw);
+      window.addEventListener("mouseup", endDraw);
+
+      canvas.addEventListener("touchstart", startDraw, { passive: false });
+      canvas.addEventListener("touchmove", draw, { passive: false });
+      window.addEventListener("touchend", endDraw);
+    }
+
+    function clearSignature(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function isCanvasBlank(canvasId) {
+      const canvas = document.getElementById(canvasId);
+      const context = canvas.getContext("2d");
+      const pixelBuffer = new Uint32Array(
+        context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+      );
+      return !pixelBuffer.some(color => color !== 0);
+    }
+
+    function switchTab(tabId) {
+      ['pengisian', 'dashboard', 'cetakan'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`btn-tab-${t}`).classList.remove('bg-white/30');
+      });
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      document.getElementById(`btn-tab-${tabId}`).classList.add('bg-white/30');
+
+      if (tabId === 'dashboard') {
+        loadDashboardData();
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      setupCanvas("canvasPengisi");
+      setupCanvas("canvasPengesah");
+      document.getElementById("tarikh").valueAsDate = new Date();
+      const days = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
+      const currentDay = days[new Date().getDay()];
+      if (document.getElementById("hari").querySelector(`option[value="${currentDay}"]`)) {
+        document.getElementById("hari").value = currentDay;
+      }
+    });
+
+    // 1. Simpan Borang ke Google Sheets
+    async function hantarBorang(e) {
+      e.preventDefault();
+
+      if (isCanvasBlank("canvasPengisi")) {
+        alert("Sila conteng tandatangan Pentadbir Bertugas sebelum menghantar borang!");
+        return;
+      }
+
+      const btn = document.getElementById("btnSubmit");
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-2"></i>Sedang Menyimpan...`;
+
+      const ttdData = document.getElementById("canvasPengisi").toDataURL("image/png");
+
+      const payload = {
+        action: "CREATE",
+        tarikh: document.getElementById("tarikh").value,
+        hari: document.getElementById("hari").value,
+        masa: document.getElementById("masa").value,
+        pentadbir: document.getElementById("pentadbir").value,
+        kehadiranGuru: document.getElementById("kehadiranGuru").value,
+        kehadiranMurid: document.getElementById("kehadiranMurid").value,
+        guruLewat: document.getElementById("guruLewat").value,
+        muridLewat: document.getElementById("muridLewat").value,
+        perhimpunan: document.querySelector('input[name="perhimpunan"]:checked')?.value || "Ada",
+        ringkasanPerhimpunan: document.getElementById("ringkasanPerhimpunan").value,
+        suasanaUmum: document.getElementById("suasanaUmum").value,
+        ikutJadual: document.querySelector('input[name="ikutJadual"]:checked')?.value || "Ya",
+        kelasTanpaGuru: document.getElementById("kelasTanpaGuru").value,
+        pemantauanPdp: document.getElementById("pemantauanPdp").value,
+        kesDisiplin: document.getElementById("kesDisiplin").value,
+        tindakanDisiplin: document.getElementById("tindakanDisiplin").value,
+        keadaanTandas: document.querySelector('input[name="keadaanTandas"]:checked')?.value || "Baik",
+        keadaanKelas: document.querySelector('input[name="keadaanKelas"]:checked')?.value || "Baik",
+        kemudahanRosak: document.getElementById("kemudahanRosak").value,
+        catatanTambahan: document.getElementById("catatanTambahan").value,
+        ttdPengisi: ttdData
+      };
+
+      try {
+        await fetch(GAS_API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        alert("Laporan berjaya dihantar ke Google Sheet!");
+        document.getElementById("formLaporan").reset();
+        clearSignature("canvasPengisi");
+        switchTab("dashboard");
+      } catch (err) {
+        alert("Ralat sambungan: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>Simpan ke Google Sheet`;
+      }
+    }
+
+    // 2. Ambil Data Dari Google Sheet
+    async function loadDashboardData() {
+      const tbody = document.getElementById("listLaporanBody");
+      tbody.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuatkan rekod laporan terkini...</td></tr>`;
+
+      try {
+        const res = await fetch(GAS_API_URL);
+        const result = await res.json();
+        if (result.status === "success") {
+          senaraiLaporanData = result.data.reverse();
+          renderDashboardTable(senaraiLaporanData);
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-rose-500">Ralat: ${result.message}</td></tr>`;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-rose-500">Gagal mengambil data: Sila pastikan capaian Web App dibuka kepada "Anyone".</td></tr>`;
+      }
+    }
+
+    function renderDashboardTable(data) {
+      const tbody = document.getElementById("listLaporanBody");
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-slate-400">Tiada rekod dijumpai.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map((item, idx) => {
+        const isDisahkan = item["Status Pengesahan"] === "Telah Disahkan";
+        return `
+          <tr class="hover:bg-slate-50 transition border-b">
+            <td class="p-3 font-medium">${item["Tarikh"] || "-"}<br><span class="text-xs text-slate-400">${item["Hari"] || ""}</span></td>
+            <td class="p-3 font-semibold text-slate-800">${item["Pentadbir Bertugas"] || "-"}</td>
+            <td class="p-3 text-xs text-slate-600">G: ${item["Kehadiran Guru"] || "-"}<br>M: ${item["Kehadiran Murid"] || "-"}</td>
+            <td class="p-3">
+              <span class="px-2 py-1 rounded-full text-xs font-semibold ${isDisahkan ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                ${item["Status Pengesahan"] || "Menunggu Pengesahan"}
+              </span>
+            </td>
+            <td class="p-3 text-center space-x-1">
+              ${!isDisahkan ? `
+                <button onclick="bukaModalSahkan('${item["ID"]}')" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white text-xs rounded shadow">
+                  <i class="fa-solid fa-signature"></i> Sahkan
+                </button>
+              ` : ''}
+              <button onclick="bukaCetakan(${idx})" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded shadow">
+                <i class="fa-solid fa-eye"></i> Lihat / Cetak
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterLaporan() {
+      const q = document.getElementById("cariTxt").value.toLowerCase();
+      const status = document.getElementById("filterStatus").value;
+
+      const filtered = senaraiLaporanData.filter(item => {
+        const matchText = (item["Pentadbir Bertugas"] || "").toLowerCase().includes(q) ||
+                          (item["Tarikh"] || "").toLowerCase().includes(q);
+        const matchStatus = (status === "Semua") || (item["Status Pengesahan"] === status);
+        return matchText && matchStatus;
+      });
+      renderDashboardTable(filtered);
+    }
+
+    // 3. Modal Sahkan Pengetua
+    function bukaModalSahkan(id) {
+      currentSelectedId = id;
+      clearSignature("canvasPengesah");
+      document.getElementById("modalSahkan").classList.remove("hidden");
+      document.getElementById("modalSahkan").classList.add("flex");
+    }
+
+    function tutupModalSahkan() {
+      document.getElementById("modalSahkan").classList.add("hidden");
+      document.getElementById("modalSahkan").classList.remove("flex");
+    }
+
+    async function hantarPengesahan() {
+      if (isCanvasBlank("canvasPengesah")) {
+        alert("Sila conteng tandatangan Pengetua terlebih dahulu!");
+        return;
+      }
+
+      const btn = document.getElementById("btnSimpanPengesahan");
+      btn.disabled = true;
+      btn.innerText = "Menyimpan...";
+
+      const ttd = document.getElementById("canvasPengesah").toDataURL("image/png");
+      const nama = document.getElementById("namaPengesahInput").value;
+      const today = new Date().toISOString().split('T')[0];
+
+      try {
+        await fetch(GAS_API_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "VERIFY",
+            id: currentSelectedId,
+            namaPengesah: nama,
+            tarikhPengesah: today,
+            ttdPengesah: ttd
+          })
+        });
+
+        alert("Pengesahan berjaya disimpan!");
+        tutupModalSahkan();
+        loadDashboardData();
+      } catch (err) {
+        alert("Gagal menghantar pengesahan: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Sahkan & Tandatangan";
+      }
+    }
+
+    // 4. Papar ke Format Cetakan
+    function bukaCetakan(index) {
+      const item = senaraiLaporanData[index];
+      if (!item) return;
+
+      document.getElementById("pTarikh").innerText = item["Tarikh"] || "-";
+      document.getElementById("pHari").innerText = item["Hari"] || "-";
+      document.getElementById("pMasa").innerText = item["Masa"] || "-";
+      document.getElementById("pPentadbir").innerText = item["Pentadbir Bertugas"] || "-";
+      document.getElementById("pNamaPengisiBawah").innerText = item["Pentadbir Bertugas"] || "-";
+
+      document.getElementById("pKehadiranGuru").innerText = item["Kehadiran Guru"] || "-";
+      document.getElementById("pKehadiranMurid").innerText = item["Kehadiran Murid"] || "-";
+      document.getElementById("pGuruLewat").innerText = item["Guru Lewat"] || "-";
+      document.getElementById("pMuridLewat").innerText = item["Murid Lewat"] || "-";
+
+      document.getElementById("pPerhimpunan").innerText = item["Perhimpunan"] || "-";
+      document.getElementById("pRingkasanPerhimpunan").innerText = item["Ringkasan Perhimpunan"] || "-";
+      document.getElementById("pSuasanaUmum").innerText = item["Suasana Umum"] || "-";
+
+      document.getElementById("pIkutJadual").innerText = item["Guru Ikut Jadual"] || "-";
+      document.getElementById("pKelasTanpaGuru").innerText = item["Kelas Tanpa Guru"] || "-";
+      document.getElementById("pPemantauanPdp").innerText = item["Pemantauan PdP"] || "-";
+
+      document.getElementById("pKesDisiplin").innerText = item["Kes Disiplin"] || "-";
+      document.getElementById("pTindakanDisiplin").innerText = item["Tindakan Disiplin"] || "-";
+
+      document.getElementById("pKeadaanTandas").innerText = item["Keadaan Tandas"] || "-";
+      document.getElementById("pKeadaanKelas").innerText = item["Keadaan Kelas"] || "-";
+      document.getElementById("pKemudahanRosak").innerText = item["Isu Kemudahan Rosak"] || "-";
+
+      document.getElementById("pCatatanTambahan").innerText = item["Catatan Tambahan"] || "-";
+
+      // Gambar Tandatangan Pengisi
+      const imgPengisi = document.getElementById("imgTtdPengisi");
+      const noTtdPengisi = document.getElementById("noTtdPengisi");
+      if (item["Tandatangan Pengisi"]) {
+        imgPengisi.src = item["Tandatangan Pengisi"];
+        imgPengisi.classList.remove("hidden");
+        noTtdPengisi.classList.add("hidden");
+      } else {
+        imgPengisi.classList.add("hidden");
+        noTtdPengisi.classList.remove("hidden");
+      }
+
+      // Gambar Tandatangan Pengetua
+      const imgPengesah = document.getElementById("imgTtdPengesah");
+      const noTtdPengesah = document.getElementById("noTtdPengesah");
+      if (item["Tandatangan Pengesah"]) {
+        imgPengesah.src = item["Tandatangan Pengesah"];
+        imgPengesah.classList.remove("hidden");
+        noTtdPengesah.classList.add("hidden");
+        document.getElementById("pNamaPengesah").innerText = item["Nama Pengesah"] || "PENGETUA";
+        document.getElementById("pTarikhPengesah").innerText = item["Tarikh Pengesah"] || "-";
+      } else {
+        imgPengesah.classList.add("hidden");
+        noTtdPengesah.classList.remove("hidden");
+        document.getElementById("pNamaPengesah").innerText = "........................................";
+        document.getElementById("pTarikhPengesah").innerText = "........................................";
+      }
+
+      switchTab("cetakan");
+    }
+  </script>
+</body>
+</html>
