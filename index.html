@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
 
-  <!-- CSS Teroptimum (Ringan, Pantas, Tanpa Framework Berat) -->
+  <!-- CSS Teroptimum (Ringan, Pantas, Tiada Framework Berat) -->
   <style>
     :root {
       --primary: #1e1b4b;
@@ -40,7 +40,7 @@
     /* Alert Banner */
     .alert-banner { display: none; padding: 14px 16px; border-radius: 8px; margin-bottom: 16px; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; }
     .alert-warning { background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; }
-    .alert-success { background-color: #d1fae5; border: 1px solid #10b981; color: #065f46; }
+    .alert-info { background-color: #e0f2fe; border: 1px solid #38bdf8; color: #0369a1; }
 
     /* Jadual Banner */
     .banner-jadual { background: linear-gradient(135deg, #1e1b4b, #2563eb); color: white; border-radius: 8px; padding: 16px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; }
@@ -70,7 +70,7 @@
     .btn-warning { background: #d97706; color: white; }
     .btn-secondary { background: #e2e8f0; color: #334155; }
     .btn-secondary:hover { background: #cbd5e1; }
-    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
 
     /* Table */
     .table-responsive { overflow-x: auto; margin-top: 14px; }
@@ -121,16 +121,25 @@
     <!-- ================= TAB 1: PENGISIAN ================= -->
     <section id="tab-pengisian">
       
-      <!-- Banner Dialog Amaran: Laporan Telah Diisi -->
+      <!-- Banner Dialog: Laporan Telah Diisi / Mod Kemaskini -->
       <div id="alertLaporanWujud" class="alert-banner alert-warning">
         <div>
           <strong>⚠️ Laporan Telah Wujud Bagi Tarikh Ini!</strong>
-          <p id="alertLaporanDesc" style="margin-top:2px;">Laporan telah dihantar sebelum ini. Sila klik butang di sebelah untuk mengemaskini rekod tanpa bertindih.</p>
+          <p id="alertLaporanDesc" style="margin-top:2px;">Rekod bagi tarikh ini telah wujud. Klik butang di sebelah untuk memuatkan data bagi mengemaskini rekod sedia ada.</p>
         </div>
         <div style="display:flex; gap:6px;">
           <button type="button" onclick="muatDataLaporanSediaAda()" class="btn btn-warning btn-sm">Muatkan Data</button>
-          <button type="button" onclick="tutupAlert()" class="btn btn-secondary btn-sm">Abaikan</button>
+          <button type="button" onclick="tutupAlert()" class="btn btn-secondary btn-sm">Tutup</button>
         </div>
+      </div>
+
+      <!-- Banner Status Mod Kemaskini Aktif -->
+      <div id="bannerModEdit" class="alert-banner alert-info" style="display:none;">
+        <div>
+          <strong>✏️ Mod Kemaskini Laporan Aktif</strong>
+          <p id="txtBannerEditDesc" style="margin-top:2px;">Anda sedang menyunting rekod. Menghantar borang ini akan mengemas kini baris yang sama tanpa pertindihan rekod.</p>
+        </div>
+        <button type="button" onclick="setSemulaBorang()" class="btn btn-secondary btn-sm">Batal Kemaskini</button>
       </div>
 
       <div class="card card-accent">
@@ -152,7 +161,7 @@
             </div>
             <div style="font-size:11px; margin-top:4px; opacity:0.8;">PENTADBIR BERTUGAS MINGGU INI:</div>
             <div id="txtNamaGuruTop" class="guru-title">Memuatkan...</div>
-            <p style="font-size:11px; opacity:0.8; font-style:italic;">* Dipadankan secara automatik mengikut jadual 2026 atau boleh ditukar kepada input manual jika ada penggantian.</p>
+            <p style="font-size:11px; opacity:0.8; font-style:italic;">* Dipadankan automatik atau pilih input manual sekiranya terdapat guru pengganti.</p>
           </div>
           <div>
             <label style="color:#e0e7ff; font-size:11px;">Pilihan Pantas Minggu:</label>
@@ -171,8 +180,9 @@
           <div style="background:#f1f5f9; padding:14px; border-radius:8px; margin-bottom:16px;">
             <div class="form-grid">
               <div class="form-group">
-                <label>Tarikh Bertugas *</label>
+                <label>Tarikh Bertugas * (Format: Hari/Bulan/Tahun)</label>
                 <input type="date" id="tarikh" required onchange="onTarikhChange()">
+                <small id="tarikhDisplayMY" style="font-size:11px; color:#1e1b4b; font-weight:700; margin-top:2px; display:block;"></small>
               </div>
               <div class="form-group">
                 <label>Hari *</label>
@@ -183,7 +193,7 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Masa</label>
+                <label>Masa Bertugas</label>
                 <input type="text" id="masa" placeholder="Cth: 7:20 PG - 2:00 PTG">
               </div>
             </div>
@@ -201,10 +211,9 @@
               <!-- Paparan Automatik -->
               <div id="boxPentadbirAuto" class="form-group" style="margin-bottom:0;">
                 <input type="text" id="pentadbir" readonly style="font-weight:700; color:#1e1b4b;">
-                <small style="color:#64748b; font-size:11px;">* Nama dan minggu bertugas diisi automatik mengikut tarikh yang dipilih.</small>
               </div>
 
-              <!-- Paparan Manual (Muncul jika pilih manual) -->
+              <!-- Paparan Manual -->
               <div id="boxPentadbirManual" class="hidden" style="margin-top:6px;">
                 <div class="form-grid">
                   <div class="form-group" style="margin-bottom:0;">
@@ -227,7 +236,6 @@
                     </datalist>
                   </div>
                 </div>
-                <small style="color:#b45309; font-size:11px; margin-top:4px; display:block;">⚠️ Mod manual aktif: Nama dan jawatan ini akan direkodkan sebagai pentadbir bertugas rasmi bagi tarikh ini.</small>
               </div>
             </div>
           </div>
@@ -271,7 +279,7 @@
             <textarea id="ringkasanPerhimpunan" rows="2" placeholder="Catatan ucapan / pengumuman"></textarea>
           </div>
           <div class="form-group">
-            <label>Suasana Umum (tenang/terganggu dll)</label>
+            <label>Suasana Umum</label>
             <input type="text" id="suasanaUmum" placeholder="Cth: Terkawal dan tenang">
           </div>
 
@@ -333,7 +341,7 @@
             <textarea id="catatanTambahan" rows="3" placeholder="Sebarang catatan penting pentadbir..."></textarea>
           </div>
 
-          <!-- 7. Lampiran Gambar (2 Kaedah: Pilih Fail atau Buka Kamera) -->
+          <!-- 7. Lampiran Gambar (Maksimum 4 Gambar) -->
           <div class="section-title">7. LAMPIRAN GAMBAR PEMANTAUAN (MAKSIMUM 4 GAMBAR)</div>
           <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
@@ -342,11 +350,9 @@
                 <p style="font-size:11px; color:#64748b;">Pilih daripada galeri atau tangkap secara terus menggunakan kamera. Dimampatkan secara automatik (~15-25KB).</p>
               </div>
 
-              <!-- Dua Input Fail Tersembunyi (Fail Galeri & Tangkap Kamera) -->
               <input type="file" id="inputGambarFail" accept="image/*" multiple style="display:none;" onchange="handlePilihGambar(event)">
               <input type="file" id="inputGambarKamera" accept="image/*" capture="environment" style="display:none;" onchange="handlePilihGambar(event)">
 
-              <!-- Butang Pilihan Tindakan -->
               <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
                 <button type="button" onclick="document.getElementById('inputGambarFail').click()" class="btn btn-secondary btn-sm" id="btnPilihFail">
                   📁 Pilih Fail / Galeri
@@ -360,17 +366,24 @@
               </div>
             </div>
 
-            <!-- Preview Grid Kad Gambar -->
             <div id="previewGambarGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:10px; margin-top:12px;"></div>
             <div id="txtKapasitiGambar" style="font-size:11px; color:#64748b; margin-top:8px;">0 daripada 4 gambar dipilih.</div>
           </div>
 
-          <!-- Scribble Tandatangan Pengisi -->
+          <!-- Tandatangan Pengisi -->
           <div class="sig-box">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <span style="font-size:12px; font-weight:700;">Tandatangan Pentadbir Bertugas: <strong id="lblPengisiSig" style="color:var(--primary);"></strong></span>
-              <button type="button" onclick="clearSig('canvasPengisi')" style="font-size:11px; color:var(--danger); background:none; border:none; cursor:pointer; text-decoration:underline;">Padam Semula</button>
+              <button type="button" onclick="padamTandatanganPengisi()" style="font-size:11px; color:var(--danger); background:none; border:none; cursor:pointer; text-decoration:underline;">Padam & Lukis Semula</button>
             </div>
+
+            <!-- Preview Tandatangan Sedia Ada (Bila Mengemaskini) -->
+            <div id="boxExistingSig" style="display:none; margin-bottom:8px;">
+              <div style="font-size:11px; color:#059669; font-weight:700; margin-bottom:4px;">✓ Tandatangan sedia ada disimpan:</div>
+              <img id="previewExistingSig" style="max-height:70px; border:1px solid #cbd5e1; background:#fff; border-radius:4px; padding:2px;" alt="Tandatangan Sedia Ada">
+              <div style="font-size:10px; color:#64748b; margin-top:2px;">(Anda tidak perlu menurunkan tandatangan lagi kecuali jika ingin menukarnya)</div>
+            </div>
+
             <canvas id="canvasPengisi" width="360" height="130" class="signature-pad"></canvas>
             <div style="font-size:10px; color:#64748b; margin-top:4px;">* Imej tandatangan dimampatkan secara automatik.</div>
           </div>
@@ -392,7 +405,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:1px solid #e2e8f0; padding-bottom:12px;">
           <div>
             <h2 style="font-size:17px; font-weight:800;">Dashboard Pemantauan Harian</h2>
-            <p style="font-size:12px; color:#64748b;">Senarai rekod, status pengesahan & masa kemaskini terkini</p>
+            <p style="font-size:12px; color:#64748b;">Senarai rekod, masa kemaskini (Malaysia) & pilihan kemaskini rekod</p>
           </div>
           <button onclick="fetchData(true)" class="btn btn-secondary btn-sm">🔄 Muat Semula Data</button>
         </div>
@@ -410,10 +423,10 @@
           <table>
             <thead>
               <tr>
-                <th>Tarikh & Hari</th>
+                <th>Tarikh (MY) & Hari</th>
                 <th>Pentadbir Bertugas</th>
                 <th>Kehadiran</th>
-                <th>Masa Kemaskini</th>
+                <th>Masa Kemaskini (MY)</th>
                 <th>Status</th>
                 <th style="text-align:center;">Tindakan</th>
               </tr>
@@ -429,7 +442,6 @@
     <!-- ================= TAB 3: CETAKAN LAPORAN (MENGIKUT BULAN) ================= -->
     <section id="tab-cetakan" class="hidden">
       
-      <!-- Panel Pilihan Bulan (No-Print) -->
       <div class="card no-print" style="border-left:4px solid var(--primary);">
         <h3 style="font-size:15px; font-weight:800; margin-bottom:6px;">Pilih Bulan Laporan</h3>
         <p style="font-size:12px; color:#64748b; margin-bottom:12px;">Hanya laporan bagi bulan yang dipilih akan disenaraikan. Klik mana-mana kad untuk membuka format cetakan rasmi.</p>
@@ -441,12 +453,10 @@
           <span id="jumlahLaporanBulan" style="font-size:12px; color:#475569; font-weight:600;"></span>
         </div>
 
-        <!-- Senarai Laporan Dalam Bulan Berkenaan -->
         <div id="senaraiKadLaporanBulan" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:10px; margin-top:14px;">
         </div>
       </div>
 
-      <!-- Toolbar Cetak -->
       <div id="toolbarCetak" class="no-print hidden" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px 16px; border-radius:8px; border:1px solid #cbd5e1;">
         <span style="font-size:12px; font-weight:600;">Laporan Sedang Dipaparkan</span>
         <button onclick="window.print()" class="btn btn-success btn-sm">🖨️ Cetak / Simpan PDF</button>
@@ -455,7 +465,6 @@
       <!-- Kertas Cetakan Format Rasmi -->
       <div id="printContainer" class="hidden">
         <div class="print-sheet">
-          <!-- Kepala Dokumen Cetakan -->
           <div style="display:flex; align-items:center; justify-content:center; gap:14px; border-bottom:2px solid #000; padding-bottom:10px; margin-bottom:12px;">
             <img src="logo.png" alt="Logo" style="height:65px;" onerror="this.classList.add('hidden')">
             <div style="text-align:center;">
@@ -465,7 +474,6 @@
             </div>
           </div>
 
-          <!-- Butiran Asas -->
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; border-bottom:1px solid #000; padding-bottom:8px; margin-bottom:12px; font-size:12px;">
             <div><strong>Tarikh:</strong> <span id="pTarikh">-</span></div>
             <div><strong>Hari:</strong> <span id="pHari">-</span></div>
@@ -473,7 +481,6 @@
             <div><strong>Masa:</strong> <span id="pMasa">-</span></div>
           </div>
 
-          <!-- 1. Kehadiran -->
           <div style="margin-bottom:10px;">
             <div style="font-weight:700; text-decoration:underline;">1. KEHADIRAN</div>
             <div style="padding-left:14px; font-size:12px;">
@@ -484,7 +491,6 @@
             </div>
           </div>
 
-          <!-- 2. Suasana Pagi -->
           <div style="margin-bottom:10px;">
             <div style="font-weight:700; text-decoration:underline;">2. SUASANA PAGI / PERHIMPUNAN</div>
             <div style="padding-left:14px; font-size:12px;">
@@ -494,7 +500,6 @@
             </div>
           </div>
 
-          <!-- 3. Pengurusan Kelas -->
           <div style="margin-bottom:10px;">
             <div style="font-weight:700; text-decoration:underline;">3. PENGURUSAN KELAS / PdP</div>
             <div style="padding-left:14px; font-size:12px;">
@@ -504,7 +509,6 @@
             </div>
           </div>
 
-          <!-- 4. Disiplin -->
           <div style="margin-bottom:10px;">
             <div style="font-weight:700; text-decoration:underline;">4. DISIPLIN & SAHSIAH MURID</div>
             <div style="padding-left:14px; font-size:12px;">
@@ -513,7 +517,6 @@
             </div>
           </div>
 
-          <!-- 5. Fasiliti & Kebersihan -->
           <div style="margin-bottom:10px;">
             <div style="font-weight:700; text-decoration:underline;">5. FASILITI & KEBERSIHAN</div>
             <div style="padding-left:14px; font-size:12px;">
@@ -523,13 +526,12 @@
             </div>
           </div>
 
-          <!-- 6. Catatan Tambahan -->
           <div style="margin-bottom:12px;">
             <div style="font-weight:700; text-decoration:underline;">6. CATATAN TAMBAHAN / PERKARA PENTING</div>
             <div id="pCatatanTambahan" style="padding:6px 14px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; font-size:12px; margin-top:4px;">-</div>
           </div>
 
-          <!-- 7. Lampiran Gambar Pemantauan (Cetakan) -->
+          <!-- Lampiran Gambar Pemantauan -->
           <div id="pSectionGambar" class="hidden" style="margin-bottom:14px;">
             <div style="font-weight:700; text-decoration:underline; font-size:12px; margin-bottom:6px;">7. LAMPIRAN GAMBAR AKTIVITI / PEMANTAUAN</div>
             <div id="pGridGambar" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;">
@@ -596,7 +598,6 @@
   <script>
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzBeeW9KU-WdXIhdduPxnDkNgsg8frXvB2iIv_vpNh61M3QPfGStpQRAe4iy3HQ34dz/exec";
 
-    // Jadual Pentadbir 2026
     const JADUAL_PENTADBIR_2026 = [
       { minggu: 1, label: "12.1.2026 - 16.1.2026", start: "2026-01-12", end: "2026-01-16", guru: "Cikgu Masnon b. Amat" },
       { minggu: 2, label: "19.1.2026 - 23.1.2026", start: "2026-01-19", end: "2026-01-23", guru: "Cikgu Shamsinah bt. Shamsudin" },
@@ -645,9 +646,43 @@
     let cachedLaporan = [];
     let currentSelectedId = null;
     let existingLaporanForDate = null;
-    let uploadedImages = []; // Menyimpan imej termampat (maks 4)
+    let uploadedImages = []; 
+    let existingTtdPengisi = ""; // Menyimpan tandatangan sedia ada semasa mod kemaskini
 
-    // ================= PAD CONTENG (CANVAS TANDATANGAN) =================
+    // ================= FUNGSI FORMAT TARIKH MALAYSIA =================
+    // Tukar dari YYYY-MM-DD kepada DD/MM/YYYY
+    function formatTarikhMY(dateStr) {
+      if (!dateStr) return "-";
+      const s = String(dateStr).trim();
+      const m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+      if (m) {
+        return `${("0" + m[3]).slice(-2)}/${("0" + m[2]).slice(-2)}/${m[1]}`;
+      }
+      return s;
+    }
+
+    // Tukar dari DD/MM/YYYY kepada YYYY-MM-DD (Untuk input HTML type="date")
+    function formatTarikhInput(dateStr) {
+      if (!dateStr) return "";
+      const s = String(dateStr).trim();
+      const mMY = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (mMY) {
+        return `${mMY[3]}-${("0" + mMY[2]).slice(-2)}-${("0" + mMY[1]).slice(-2)}`;
+      }
+      const mISO = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+      if (mISO) {
+        return `${mISO[1]}-${("0" + mISO[2]).slice(-2)}-${("0" + mISO[3]).slice(-2)}`;
+      }
+      return dateStr;
+    }
+
+    // Padankan tarikh secara universal
+    function padanTarikh(t1, t2) {
+      if (!t1 || !t2) return false;
+      return formatTarikhInput(t1) === formatTarikhInput(t2);
+    }
+
+    // ================= CANVAS PAD TANDATANGAN =================
     function setupCanvas(canvasId) {
       const canvas = document.getElementById(canvasId);
       const ctx = canvas.getContext("2d");
@@ -717,7 +752,13 @@
       return temp.toDataURL("image/jpeg", 0.6);
     }
 
-    // ================= FUNGSI PEMAMPATAN GAMBAR (CANVAS AUTO-RESIZE) =================
+    function padamTandatanganPengisi() {
+      clearSig("canvasPengisi");
+      existingTtdPengisi = "";
+      document.getElementById("boxExistingSig").style.display = "none";
+    }
+
+    // ================= PEMAMPATAN GAMBAR =================
     function compressImageFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -749,7 +790,6 @@
             ctx.fillRect(0, 0, width, height);
             ctx.drawImage(img, 0, 0, width, height);
 
-            // Mampatkan ke JPEG 0.55 (~15-25KB sahaja)
             const dataUrl = canvas.toDataURL("image/jpeg", 0.55);
             resolve(dataUrl);
           };
@@ -761,7 +801,6 @@
       });
     }
 
-    // Mengendalikan pemilihan sama ada daripada Fail/Galeri atau Kamera
     async function handlePilihGambar(event) {
       const files = Array.from(event.target.files);
       if (!files || files.length === 0) return;
@@ -774,14 +813,10 @@
       }
 
       const filesToProcess = files.slice(0, bakiSlot);
-      if (files.length > bakiSlot) {
-        alert(`Hanya ${bakiSlot} gambar pertama diproses kerana had maksimum ialah 4 gambar.`);
-      }
-
       for (const file of filesToProcess) {
         try {
-          const compressedDataUrl = await compressImageFile(file);
-          uploadedImages.push(compressedDataUrl);
+          const compressed = await compressImageFile(file);
+          uploadedImages.push(compressed);
         } catch (err) {
           console.error("Gagal memampatkan gambar:", err);
         }
@@ -812,7 +847,7 @@
       uploadedImages.forEach((imgData, idx) => {
         const approxKb = Math.round((imgData.length * 3 / 4) / 1024);
         const card = document.createElement("div");
-        card.style.cssText = "position:relative; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,0.05);";
+        card.style.cssText = "position:relative; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden;";
         card.innerHTML = `
           <img src="${imgData}" style="width:100%; height:90px; object-fit:cover; display:block;" alt="Gambar ${idx + 1}">
           <div style="padding:4px 6px; display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border-top:1px solid #e2e8f0;">
@@ -830,13 +865,13 @@
     }
 
     function padamSemuaGambar() {
-      if (confirm("Adakah anda pasti untuk memadam semua gambar yang telah dipilih?")) {
+      if (confirm("Padam semua gambar lampiran?")) {
         uploadedImages = [];
         renderPreviewGambar();
       }
     }
 
-    // ================= MOD PENTADBIR BERTUGAS (AUTO VS MANUAL) =================
+    // ================= MOD PENTADBIR BERTUGAS =================
     function toggleModPentadbir() {
       const mod = document.querySelector('input[name="modPentadbir"]:checked').value;
       const boxAuto = document.getElementById("boxPentadbirAuto");
@@ -881,7 +916,7 @@
       if (t === 'cetakan') inisialisasiTabCetakan();
     }
 
-    // ================= JADUAL PENTADBIR DROPDOWN =================
+    // ================= JADUAL DROPDOWN =================
     function initMingguDropdown() {
       const sel = document.getElementById("selectMingguJadual");
       sel.innerHTML = JADUAL_PENTADBIR_2026.map(item => 
@@ -899,8 +934,14 @@
     }
 
     function onTarikhChange() {
-      const tVal = document.getElementById("tarikh").value;
-      if (!tVal) return;
+      const tVal = document.getElementById("tarikh").value; // Format ISO: YYYY-MM-DD
+      if (!tVal) {
+        document.getElementById("tarikhDisplayMY").innerText = "";
+        return;
+      }
+
+      // Paparkan format tarikh Malaysia di bawah input
+      document.getElementById("tarikhDisplayMY").innerText = `Tarikh Malaysia: ${formatTarikhMY(tVal)}`;
 
       const d = new Date(tVal + "T00:00:00");
       const days = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
@@ -931,20 +972,19 @@
       if (match) setMingguInfo(match);
     }
 
-    function semakLaporanTarikh(tarikhStr) {
+    // Semak jika rekod tarikh telah wujud
+    function semakLaporanTarikh(tarikhISO) {
       const alertBox = document.getElementById("alertLaporanWujud");
-      existingLaporanForDate = cachedLaporan.find(r => r["Tarikh"] === tarikhStr);
+      existingLaporanForDate = cachedLaporan.find(r => padanTarikh(r["Tarikh"], tarikhISO));
 
-      if (existingLaporanForDate) {
+      if (existingLaporanForDate && document.getElementById("reportId").value !== existingLaporanForDate["ID"]) {
         const masaKini = existingLaporanForDate["Masa Kemaskini"] || existingLaporanForDate["Timestamp"] || "-";
+        const tMY = formatTarikhMY(existingLaporanForDate["Tarikh"]);
         document.getElementById("alertLaporanDesc").innerHTML = 
-          `Laporan tarikh <strong>${tarikhStr}</strong> telah diisi oleh <strong>${existingLaporanForDate["Pentadbir Bertugas"]}</strong>.<br>Masa rekod terakhir: <strong>${masaKini}</strong>.`;
+          `Laporan tarikh <strong>${tMY}</strong> telah diisi oleh <strong>${existingLaporanForDate["Pentadbir Bertugas"]}</strong>.<br>Masa rekod terakhir (MY): <strong>${masaKini}</strong>.`;
         alertBox.style.display = "flex";
       } else {
         alertBox.style.display = "none";
-        document.getElementById("btnHantarText").innerText = "Simpan Laporan ke Google Sheet";
-        document.getElementById("infoKemaskiniTerakhir").style.display = "none";
-        document.getElementById("reportId").value = "";
       }
     }
 
@@ -952,16 +992,33 @@
       document.getElementById("alertLaporanWujud").style.display = "none";
     }
 
-    // ================= MUAT DATA SEDIA ADA =================
-    function muatDataLaporanSediaAda() {
-      if (!existingLaporanForDate) return;
-      const item = existingLaporanForDate;
+    // ================= FUNGSI KEMASKINI PENUH =================
+    function editLaporan(id) {
+      const item = cachedLaporan.find(r => r["ID"] === id);
+      if (!item) return;
 
+      muatDataLaporanObj(item);
+      switchTab('pengisian');
+    }
+
+    function muatDataLaporanSediaAda() {
+      if (existingLaporanForDate) {
+        muatDataLaporanObj(existingLaporanForDate);
+      }
+    }
+
+    function muatDataLaporanObj(item) {
       document.getElementById("reportId").value = item["ID"] || "";
       document.getElementById("existingCreatedTimeVal").value = item["Timestamp"] || "";
       document.getElementById("statusPengesahanVal").value = item["Status Pengesahan"] || "Menunggu Pengesahan";
 
-      // Pengesanan Mod Pentadbir (Auto vs Manual)
+      // Set Tarikh dalam format ISO input date
+      const tarikhISO = formatTarikhInput(item["Tarikh"]);
+      document.getElementById("tarikh").value = tarikhISO;
+      document.getElementById("tarikhDisplayMY").innerText = `Tarikh Malaysia: ${formatTarikhMY(item["Tarikh"])}`;
+      document.getElementById("hari").value = item["Hari"] || "";
+
+      // Pentadbir Bertugas (Auto vs Manual)
       const pVal = item["Pentadbir Bertugas"] || "";
       if (pVal.includes("[Minggu")) {
         document.querySelector('input[name="modPentadbir"][value="auto"]').checked = true;
@@ -969,10 +1026,10 @@
       } else {
         document.querySelector('input[name="modPentadbir"][value="manual"]').checked = true;
         toggleModPentadbir();
-        const matchJawatan = pVal.match(/^(.*?)\s*\((.*?)\)$/);
-        if (matchJawatan) {
-          document.getElementById("namaPentadbirManual").value = matchJawatan[1].trim();
-          document.getElementById("jawatanPentadbirManual").value = matchJawatan[2].trim();
+        const matchJ = pVal.match(/^(.*?)\s*\((.*?)\)$/);
+        if (matchJ) {
+          document.getElementById("namaPentadbirManual").value = matchJ[1].trim();
+          document.getElementById("jawatanPentadbirManual").value = matchJ[2].trim();
         } else {
           document.getElementById("namaPentadbirManual").value = pVal;
           document.getElementById("jawatanPentadbirManual").value = "";
@@ -1003,7 +1060,7 @@
       document.getElementById("kemudahanRosak").value = item["Isu Kemudahan Rosak"] || "";
       document.getElementById("catatanTambahan").value = item["Catatan Tambahan"] || "";
 
-      // Muat Gambar Sedia Ada
+      // Muatkan Gambar Lampiran Sedia Ada
       uploadedImages = [];
       if (item["Gambar 1"]) uploadedImages.push(item["Gambar 1"]);
       if (item["Gambar 2"]) uploadedImages.push(item["Gambar 2"]);
@@ -1011,13 +1068,30 @@
       if (item["Gambar 4"]) uploadedImages.push(item["Gambar 4"]);
       renderPreviewGambar();
 
+      // Muatkan Tandatangan Sedia Ada
+      clearSig("canvasPengisi");
+      if (item["Tandatangan Pengisi"]) {
+        existingTtdPengisi = item["Tandatangan Pengisi"];
+        document.getElementById("previewExistingSig").src = existingTtdPengisi;
+        document.getElementById("boxExistingSig").style.display = "block";
+      } else {
+        existingTtdPengisi = "";
+        document.getElementById("boxExistingSig").style.display = "none";
+      }
+
+      // Paparan Status Mod Kemaskini
       const kemaskini = item["Masa Kemaskini"] || item["Timestamp"] || "-";
       document.getElementById("txtKemaskiniTerakhir").innerText = kemaskini;
       document.getElementById("infoKemaskiniTerakhir").style.display = "block";
 
-      document.getElementById("btnHantarText").innerText = "Kemaskini Laporan (Elak Bertindih)";
+      document.getElementById("txtBannerEditDesc").innerHTML = 
+        `Menyunting rekod bertarikh <strong>${formatTarikhMY(item["Tarikh"])}</strong> (ID: <code>${item["ID"]}</code>). Sebarang perubahan akan menimpa baris yang sama.`;
+      document.getElementById("bannerModEdit").style.display = "flex";
+
+      document.getElementById("btnHantarText").innerText = "Simpan Perubahan Laporan (Kemaskini)";
       tutupAlert();
-      alert("Data laporan sedia ada telah dimuatkan. Sila semak, kemaskini dan turunkan tandatangan untuk menyimpan semula.");
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function setRadioVal(name, val) {
@@ -1028,10 +1102,13 @@
     function setSemulaBorang() {
       document.getElementById("formLaporan").reset();
       clearSig("canvasPengisi");
+      existingTtdPengisi = "";
+      document.getElementById("boxExistingSig").style.display = "none";
       uploadedImages = [];
       renderPreviewGambar();
       document.getElementById("reportId").value = "";
       document.getElementById("infoKemaskiniTerakhir").style.display = "none";
+      document.getElementById("bannerModEdit").style.display = "none";
       document.getElementById("btnHantarText").innerText = "Simpan Laporan ke Google Sheet";
       tutupAlert();
 
@@ -1055,17 +1132,22 @@
           return cachedLaporan;
         }
       } catch (err) {
-        console.error("Gagal ambil data", err);
+        console.error("Gagal mengambil data:", err);
       }
       return cachedLaporan;
     }
 
-    // ================= SIMPAN / HANTAR BORANG =================
+    // ================= SIMPAN / HANTAR BORANG (ANTI DUPLIKASI) =================
     async function hantarBorang(e) {
       e.preventDefault();
 
-      if (isCanvasBlank("canvasPengisi")) {
-        alert("Sila conteng tandatangan Pentadbir Bertugas terlebih dahulu!");
+      let ttdFinal = "";
+      if (!isCanvasBlank("canvasPengisi")) {
+        ttdFinal = compressSignature("canvasPengisi");
+      } else if (existingTtdPengisi) {
+        ttdFinal = existingTtdPengisi; // Kekalkan tandatangan asal semasa kemaskini
+      } else {
+        alert("Sila turunkan tandatangan Pentadbir Bertugas terlebih dahulu!");
         return;
       }
 
@@ -1073,14 +1155,21 @@
       btn.disabled = true;
       btn.style.opacity = "0.7";
       const oriText = document.getElementById("btnHantarText").innerText;
-      document.getElementById("btnHantarText").innerText = "Sedang Menyimpan & Memampatkan...";
+      document.getElementById("btnHantarText").innerText = "Sedang Menyimpan...";
 
-      const ttdCompressed = compressSignature("canvasPengisi");
+      const rawTarikh = document.getElementById("tarikh").value;
+      const tarikhMYFormatted = formatTarikhMY(rawTarikh);
+      const currentReportId = document.getElementById("reportId").value;
+
+      // Cipta masa kemaskini format Malaysia tempatan
+      const now = new Date();
+      const padZero = (n) => ("0" + n).slice(-2);
+      const nowStrMY = `${padZero(now.getDate())}/${padZero(now.getMonth() + 1)}/${now.getFullYear()}, ${padZero(now.getHours())}:${padZero(now.getMinutes())}:${padZero(now.getSeconds())}`;
 
       const payload = {
         action: "SAVE",
-        id: document.getElementById("reportId").value || "",
-        tarikh: document.getElementById("tarikh").value,
+        id: currentReportId || "",
+        tarikh: tarikhMYFormatted,
         hari: document.getElementById("hari").value,
         masa: document.getElementById("masa").value,
         pentadbir: document.getElementById("pentadbir").value,
@@ -1101,7 +1190,7 @@
         kemudahanRosak: document.getElementById("kemudahanRosak").value,
         catatanTambahan: document.getElementById("catatanTambahan").value,
         statusPengesahan: document.getElementById("statusPengesahanVal").value || "Menunggu Pengesahan",
-        ttdPengisi: ttdCompressed,
+        ttdPengisi: ttdFinal,
         gambar1: uploadedImages[0] || "",
         gambar2: uploadedImages[1] || "",
         gambar3: uploadedImages[2] || "",
@@ -1116,10 +1205,58 @@
           body: JSON.stringify(payload)
         });
 
-        alert("Laporan dan gambar berjaya disimpan / dikemaskini tanpa rekod bertindih!");
-        await fetchData(true);
+        // KEMASKINI CACHE TEMPATAN SERTA-MERTA (Mencegah paparan data bertindih sebelum Sheet siap menulis)
+        const updatedRecord = {
+          "ID": currentReportId || ("REP-" + now.getTime()),
+          "Timestamp": document.getElementById("existingCreatedTimeVal").value || nowStrMY,
+          "Tarikh": tarikhMYFormatted,
+          "Hari": payload.hari,
+          "Masa": payload.masa,
+          "Pentadbir Bertugas": payload.pentadbir,
+          "Kehadiran Guru": payload.kehadiranGuru,
+          "Kehadiran Murid": payload.kehadiranMurid,
+          "Guru Lewat": payload.guruLewat,
+          "Murid Lewat": payload.muridLewat,
+          "Perhimpunan": payload.perhimpunan,
+          "Ringkasan Perhimpunan": payload.ringkasanPerhimpunan,
+          "Suasana Umum": payload.suasanaUmum,
+          "Guru Ikut Jadual": payload.ikutJadual,
+          "Kelas Tanpa Guru": payload.kelasTanpaGuru,
+          "Pemantauan PdP": payload.pemantauanPdp,
+          "Kes Disiplin": payload.kesDisiplin,
+          "Tindakan Disiplin": payload.tindakanDisiplin,
+          "Keadaan Tandas": payload.keadaanTandas,
+          "Keadaan Kelas": payload.keadaanKelas,
+          "Isu Kemudahan Rosak": payload.kemudahanRosak,
+          "Catatan Tambahan": payload.catatanTambahan,
+          "Tandatangan Pengisi": payload.ttdPengisi,
+          "Status Pengesahan": payload.statusPengesahan,
+          "Masa Kemaskini": nowStrMY,
+          "Gambar 1": payload.gambar1,
+          "Gambar 2": payload.gambar2,
+          "Gambar 3": payload.gambar3,
+          "Gambar 4": payload.gambar4
+        };
+
+        // Ganti rekod lama jika mengemaskini, atau tambah ke atas jika baru
+        const sediaIndex = cachedLaporan.findIndex(r => (currentReportId && r["ID"] === currentReportId) || padanTarikh(r["Tarikh"], tarikhMYFormatted));
+        if (sediaIndex !== -1) {
+          cachedLaporan[sediaIndex] = updatedRecord;
+        } else {
+          cachedLaporan.unshift(updatedRecord);
+        }
+
+        renderDashboardTable(cachedLaporan);
+        alert(currentReportId ? "Laporan berjaya dikemaskini tanpa rekod bertindih!" : "Laporan baharu berjaya disimpan!");
+
         setSemulaBorang();
         switchTab("dashboard");
+
+        // Tunggu 2.5 saat untuk Google Sheet melengkapkan penulisan sebelum penyegerakan latar belakang
+        setTimeout(() => {
+          fetchData(true);
+        }, 2500);
+
       } catch (err) {
         alert("Ralat sambungan: " + err.message);
       } finally {
@@ -1140,12 +1277,13 @@
       tbody.innerHTML = data.map((item) => {
         const isDisahkan = item["Status Pengesahan"] === "Telah Disahkan";
         const masaKini = item["Masa Kemaskini"] || item["Timestamp"] || "-";
+        const tarikhMY = formatTarikhMY(item["Tarikh"]);
         const totalGambar = [item["Gambar 1"], item["Gambar 2"], item["Gambar 3"], item["Gambar 4"]].filter(Boolean).length;
 
         return `
           <tr>
             <td>
-              <strong>${item["Tarikh"] || "-"}</strong><br>
+              <strong>${tarikhMY}</strong><br>
               <small style="color:#64748b;">${item["Hari"] || ""}</small>
               ${totalGambar > 0 ? `<br><span style="font-size:10px; background:#e0e7ff; color:#3730a3; padding:1px 5px; border-radius:4px; font-weight:700;">📷 ${totalGambar} Gambar</span>` : ''}
             </td>
@@ -1158,7 +1296,8 @@
               </span>
             </td>
             <td style="text-align:center;">
-              <div style="display:inline-flex; gap:4px;">
+              <div style="display:inline-flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+                <button onclick="editLaporan('${item["ID"]}')" class="btn btn-secondary btn-sm" title="Kemaskini Laporan">✏️ Edit</button>
                 ${!isDisahkan ? `<button onclick="bukaModalSahkan('${item["ID"]}')" class="btn btn-warning btn-sm">Sahkan</button>` : ''}
                 <button onclick="pilihDanBukaCetakan('${item["ID"]}')" class="btn btn-primary btn-sm">Cetak</button>
               </div>
@@ -1173,8 +1312,8 @@
       const status = document.getElementById("filterStatus").value;
 
       const filtered = cachedLaporan.filter(item => {
-        const matchText = (item["Pentadbir Bertugas"] || "").toLowerCase().includes(q) ||
-                          (item["Tarikh"] || "").toLowerCase().includes(q);
+        const tMY = formatTarikhMY(item["Tarikh"]).toLowerCase();
+        const matchText = (item["Pentadbir Bertugas"] || "").toLowerCase().includes(q) || tMY.includes(q);
         const matchStatus = (status === "Semua") || (item["Status Pengesahan"] === status);
         return matchText && matchStatus;
       });
@@ -1222,7 +1361,17 @@
 
         alert("Pengesahan Pengetua berjaya disimpan!");
         tutupModalSahkan();
-        await fetchData(true);
+
+        // Kemaskini status tempatan serta-merta
+        const idx = cachedLaporan.findIndex(r => r["ID"] === currentSelectedId);
+        if (idx !== -1) {
+          cachedLaporan[idx]["Status Pengesahan"] = "Telah Disahkan";
+          cachedLaporan[idx]["Nama Pengesah"] = nama;
+          cachedLaporan[idx]["Tandatangan Pengesah"] = ttd;
+          renderDashboardTable(cachedLaporan);
+        }
+
+        setTimeout(() => { fetchData(true); }, 2000);
       } catch (err) {
         alert("Ralat pengesahan: " + err.message);
       } finally {
@@ -1244,7 +1393,8 @@
       const bulanSet = new Set();
       cachedLaporan.forEach(item => {
         if (item["Tarikh"]) {
-          const parts = item["Tarikh"].split('-');
+          const iso = formatTarikhInput(item["Tarikh"]);
+          const parts = iso.split('-');
           if (parts.length >= 2) {
             bulanSet.add(`${parts[0]}-${parts[1]}`);
           }
@@ -1280,7 +1430,10 @@
       const kadContainer = document.getElementById("senaraiKadLaporanBulan");
       const labelJumlah = document.getElementById("jumlahLaporanBulan");
 
-      const senarai = cachedLaporan.filter(item => (item["Tarikh"] || "").startsWith(ym));
+      const senarai = cachedLaporan.filter(item => {
+        const iso = formatTarikhInput(item["Tarikh"]);
+        return iso.startsWith(ym);
+      });
       labelJumlah.innerText = `(${senarai.length} rekod dijumpai)`;
 
       if (senarai.length === 0) {
@@ -1292,10 +1445,11 @@
 
       kadContainer.innerHTML = senarai.map(item => {
         const totalGambar = [item["Gambar 1"], item["Gambar 2"], item["Gambar 3"], item["Gambar 4"]].filter(Boolean).length;
+        const tarikhMY = formatTarikhMY(item["Tarikh"]);
         return `
           <div onclick="pilihDanPaparCetakan('${item["ID"]}')" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:6px; padding:10px; cursor:pointer; transition:0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='#cbd5e1'">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <strong style="font-size:13px; color:var(--primary);">${item["Tarikh"]} (${item["Hari"] || ""})</strong>
+              <strong style="font-size:13px; color:var(--primary);">${tarikhMY} (${item["Hari"] || ""})</strong>
               <span class="badge" style="font-size:9px; background:${item["Status Pengesahan"] === 'Telah Disahkan' ? '#d1fae5' : '#fef3c7'}; color:${item["Status Pengesahan"] === 'Telah Disahkan' ? '#065f46' : '#92400e'};">
                 ${item["Status Pengesahan"] || "Menunggu"}
               </span>
@@ -1319,14 +1473,14 @@
       const item = cachedLaporan.find(r => r["ID"] === id);
       if (!item) return;
 
-      document.getElementById("pTarikh").innerText = item["Tarikh"] || "-";
+      document.getElementById("pTarikh").innerText = formatTarikhMY(item["Tarikh"]) || "-";
       document.getElementById("pHari").innerText = item["Hari"] || "-";
       document.getElementById("pMasa").innerText = item["Masa"] || "-";
       document.getElementById("pPentadbir").innerText = item["Pentadbir Bertugas"] || "-";
       document.getElementById("pNamaPengisiBawah").innerText = item["Pentadbir Bertugas"] || "-";
 
       const kemaskini = item["Masa Kemaskini"] || item["Timestamp"] || "-";
-      document.getElementById("pKemaskiniInfo").innerText = `Masa Kemaskini: ${kemaskini}`;
+      document.getElementById("pKemaskiniInfo").innerText = `Masa Kemaskini (MY): ${kemaskini}`;
 
       document.getElementById("pKehadiranGuru").innerText = item["Kehadiran Guru"] || "-";
       document.getElementById("pKehadiranMurid").innerText = item["Kehadiran Murid"] || "-";
@@ -1387,7 +1541,7 @@
         imgPengesah.classList.remove("hidden");
         noTtdPengesah.classList.add("hidden");
         document.getElementById("pNamaPengesah").innerText = item["Nama Pengesah"] || "PENGETUA";
-        document.getElementById("pTarikhPengesah").innerText = item["Tarikh Pengesah"] || "-";
+        document.getElementById("pTarikhPengesah").innerText = formatTarikhMY(item["Tarikh Pengesah"]) || "-";
       } else {
         imgPengesah.classList.add("hidden");
         noTtdPengesah.classList.remove("hidden");
