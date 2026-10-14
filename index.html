@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
 
-  <!-- CSS Teroptimum (Ultra Ringan, Tiada Framework Berat) -->
+  <!-- CSS Teroptimum (Ringan, Pantas, Tanpa Framework Berat) -->
   <style>
     :root {
       --primary: #1e1b4b;
@@ -37,7 +37,7 @@
     .card { background: var(--surface); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
     .card-accent { border-top: 4px solid var(--primary); }
 
-    /* Alert Dialog */
+    /* Alert Banner */
     .alert-banner { display: none; padding: 14px 16px; border-radius: 8px; margin-bottom: 16px; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; }
     .alert-warning { background-color: #fef3c7; border: 1px solid #f59e0b; color: #92400e; }
     .alert-success { background-color: #d1fae5; border: 1px solid #10b981; color: #065f46; }
@@ -69,7 +69,8 @@
     .btn-success { background: var(--success); color: white; }
     .btn-warning { background: #d97706; color: white; }
     .btn-secondary { background: #e2e8f0; color: #334155; }
-    .btn-sm { padding: 5px 10px; font-size: 11px; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
 
     /* Table */
     .table-responsive { overflow-x: auto; margin-top: 14px; }
@@ -151,7 +152,7 @@
             </div>
             <div style="font-size:11px; margin-top:4px; opacity:0.8;">PENTADBIR BERTUGAS MINGGU INI:</div>
             <div id="txtNamaGuruTop" class="guru-title">Memuatkan...</div>
-            <p style="font-size:11px; opacity:0.8; font-style:italic;">* Ditentukan mengikut jadual 2026. Anda boleh beralih ke input manual jika terdapat penggantian pentadbir.</p>
+            <p style="font-size:11px; opacity:0.8; font-style:italic;">* Dipadankan secara automatik mengikut jadual 2026 atau boleh ditukar kepada input manual jika ada penggantian.</p>
           </div>
           <div>
             <label style="color:#e0e7ff; font-size:11px;">Pilihan Pantas Minggu:</label>
@@ -160,13 +161,13 @@
           </div>
         </div>
 
-        <!-- Borang -->
+        <!-- Borang Utama -->
         <form id="formLaporan" onsubmit="hantarBorang(event)">
           <input type="hidden" id="reportId" value="">
           <input type="hidden" id="statusPengesahanVal" value="Menunggu Pengesahan">
           <input type="hidden" id="existingCreatedTimeVal" value="">
 
-          <!-- Bahagian Maklumat Tarikh & Kaedah Pentadbir Bertugas -->
+          <!-- Bahagian Maklumat Tarikh & Pilihan Pentadbir -->
           <div style="background:#f1f5f9; padding:14px; border-radius:8px; margin-bottom:16px;">
             <div class="form-grid">
               <div class="form-group">
@@ -332,18 +333,26 @@
             <textarea id="catatanTambahan" rows="3" placeholder="Sebarang catatan penting pentadbir..."></textarea>
           </div>
 
-          <!-- 7. Lampiran Gambar (Maksimum 4 Gambar dengan Pemampatan Pantas) -->
+          <!-- 7. Lampiran Gambar (2 Kaedah: Pilih Fail atau Buka Kamera) -->
           <div class="section-title">7. LAMPIRAN GAMBAR PEMANTAUAN (MAKSIMUM 4 GAMBAR)</div>
           <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
               <div>
-                <label style="font-weight:700; margin-bottom:2px;">Muat Naik Gambar Aktiviti / Kawasan Sekolah</label>
-                <p style="font-size:11px; color:#64748b;">Maksimum 4 keping. Gambar <strong>dimampatkan secara automatik</strong> sebelum dihantar supaya pantas dan menjimatkan data.</p>
+                <label style="font-weight:700; margin-bottom:2px;">Tambah Gambar Pemantauan / Kawasan Sekolah</label>
+                <p style="font-size:11px; color:#64748b;">Pilih daripada galeri atau tangkap secara terus menggunakan kamera. Dimampatkan secara automatik (~15-25KB).</p>
               </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <input type="file" id="inputGambar" accept="image/*" multiple style="display:none;" onchange="handlePilihGambar(event)">
-                <button type="button" onclick="document.getElementById('inputGambar').click()" class="btn btn-secondary btn-sm" id="btnPilihGambar">
-                  📷 Pilih / Tambah Gambar
+
+              <!-- Dua Input Fail Tersembunyi (Fail Galeri & Tangkap Kamera) -->
+              <input type="file" id="inputGambarFail" accept="image/*" multiple style="display:none;" onchange="handlePilihGambar(event)">
+              <input type="file" id="inputGambarKamera" accept="image/*" capture="environment" style="display:none;" onchange="handlePilihGambar(event)">
+
+              <!-- Butang Pilihan Tindakan -->
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <button type="button" onclick="document.getElementById('inputGambarFail').click()" class="btn btn-secondary btn-sm" id="btnPilihFail">
+                  📁 Pilih Fail / Galeri
+                </button>
+                <button type="button" onclick="document.getElementById('inputGambarKamera').click()" class="btn btn-secondary btn-sm" id="btnBukaKamera" style="border-color:#3b82f6; color:#1d4ed8;">
+                  📸 Buka Kamera
                 </button>
                 <button type="button" onclick="padamSemuaGambar()" class="btn btn-secondary btn-sm" id="btnPadamSemuaGambar" style="color:var(--danger); display:none;">
                   Padam Semua
@@ -443,7 +452,7 @@
         <button onclick="window.print()" class="btn btn-success btn-sm">🖨️ Cetak / Simpan PDF</button>
       </div>
 
-      <!-- Kertas Cetakan Format Rasmi (Hanya muncul bila laporan dipilih) -->
+      <!-- Kertas Cetakan Format Rasmi -->
       <div id="printContainer" class="hidden">
         <div class="print-sheet">
           <!-- Kepala Dokumen Cetakan -->
@@ -527,7 +536,7 @@
             </div>
           </div>
 
-          <!-- Tandatangan Cetakan -->
+          <!-- Ruangan Tandatangan Cetakan -->
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; border-top:1px solid #000; padding-top:12px; margin-top:14px;">
             <div>
               <p style="font-size:11px; font-weight:700;">DISEDIAKAN OLEH (PENTADBIR BERTUGAS):</p>
@@ -636,7 +645,7 @@
     let cachedLaporan = [];
     let currentSelectedId = null;
     let existingLaporanForDate = null;
-    let uploadedImages = []; // Menyimpan gambar yang dimampatkan (maks 4)
+    let uploadedImages = []; // Menyimpan imej termampat (maks 4)
 
     // ================= PAD CONTENG (CANVAS TANDATANGAN) =================
     function setupCanvas(canvasId) {
@@ -752,6 +761,7 @@
       });
     }
 
+    // Mengendalikan pemilihan sama ada daripada Fail/Galeri atau Kamera
     async function handlePilihGambar(event) {
       const files = Array.from(event.target.files);
       if (!files || files.length === 0) return;
@@ -765,7 +775,7 @@
 
       const filesToProcess = files.slice(0, bakiSlot);
       if (files.length > bakiSlot) {
-        alert(`Hanya ${bakiSlot} gambar pertama diproses kerana had maksimum adalah 4 gambar.`);
+        alert(`Hanya ${bakiSlot} gambar pertama diproses kerana had maksimum ialah 4 gambar.`);
       }
 
       for (const file of filesToProcess) {
@@ -785,19 +795,19 @@
       const container = document.getElementById("previewGambarGrid");
       const txtKapasiti = document.getElementById("txtKapasitiGambar");
       const btnPadamSemua = document.getElementById("btnPadamSemuaGambar");
-      const btnPilih = document.getElementById("btnPilihGambar");
+      const btnPilihFail = document.getElementById("btnPilihFail");
+      const btnBukaKamera = document.getElementById("btnBukaKamera");
 
       container.innerHTML = "";
       txtKapasiti.innerText = `${uploadedImages.length} daripada 4 gambar dipilih.`;
 
       btnPadamSemua.style.display = uploadedImages.length > 0 ? "inline-flex" : "none";
-      if (uploadedImages.length >= 4) {
-        btnPilih.disabled = true;
-        btnPilih.style.opacity = "0.5";
-      } else {
-        btnPilih.disabled = false;
-        btnPilih.style.opacity = "1";
-      }
+      
+      const isFull = uploadedImages.length >= 4;
+      btnPilihFail.disabled = isFull;
+      btnPilihFail.style.opacity = isFull ? "0.5" : "1";
+      btnBukaKamera.disabled = isFull;
+      btnBukaKamera.style.opacity = isFull ? "0.5" : "1";
 
       uploadedImages.forEach((imgData, idx) => {
         const approxKb = Math.round((imgData.length * 3 / 4) / 1024);
@@ -839,7 +849,7 @@
       } else {
         boxAuto.classList.remove("hidden");
         boxManual.classList.add("hidden");
-        onTarikhChange(); // Kembalikan ke jadual automatik
+        onTarikhChange();
       }
     }
 
@@ -993,7 +1003,7 @@
       document.getElementById("kemudahanRosak").value = item["Isu Kemudahan Rosak"] || "";
       document.getElementById("catatanTambahan").value = item["Catatan Tambahan"] || "";
 
-      // Muatkan Gambar Lampiran
+      // Muat Gambar Sedia Ada
       uploadedImages = [];
       if (item["Gambar 1"]) uploadedImages.push(item["Gambar 1"]);
       if (item["Gambar 2"]) uploadedImages.push(item["Gambar 2"]);
